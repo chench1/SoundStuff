@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_from_directory, url_for,
 import os
 from werkzeug.utils import secure_filename
 import base64
+import subprocess
 
 app = Flask(__name__)
 
@@ -34,7 +35,8 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             queue.append(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            os.system('python jeff.py ./' + filename)
+            # os.system('python3 jeff.py ./ &; disown' + filename)
+            subprocess.Popen(['python3', 'jeff.py', filename])
             with open('./' + filename, 'rb') as img_file:
                 img_data = base64.b64encode(img_file.read()).decode('utf-8')
             return render_template('index.html', img_data=img_data)
